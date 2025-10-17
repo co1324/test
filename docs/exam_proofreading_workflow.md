@@ -63,6 +63,26 @@ graph TD
 - `RAGValidator` – 검색된 법령 조각과 페이지 텍스트를 결합해 LLM에게 검수 리포트를 요청합니다.
 - `ExamProofreader` – 위 단계 전체를 연결하여 페이지별 리포트를 JSON 형식으로 저장합니다.
 
+## 로컬 저장 위치와 폴더 구조
+
+- 저장소를 처음 클론하면 Git이 **현재 터미널의 위치**에 저장소 이름과 동일한 폴더(예: `exam-proofreading`)를 만듭니다.
+- 폴더 안에는 다음과 같은 하위 경로가 있습니다.
+  - `exam_proofreading/` – 실제 파이프라인 모듈 코드
+  - `docs/` – 워크플로우 및 실행 가이드 문서
+  - `pyproject.toml` – 패키지 메타데이터와 의존성 정의
+- Windows에서는 대개 `C:\\Users\\사용자이름\\Documents\\exam-proofreading` 같은 경로에, macOS/Linux에서는 `~/exam-proofreading` 같은 경로에 위치합니다.
+- 터미널에서 다음 명령으로 현재 위치와 폴더를 확인할 수 있습니다.
+
+```bash
+pwd            # 현재 위치 출력 (PowerShell에서는 Get-Location)
+ls             # 폴더 목록 보기 (PowerShell에서는 dir)
+```
+
+- 탐색기/파인더에서 폴더를 열고 싶다면 해당 위치에서 다음 명령을 실행하세요.
+  - Windows PowerShell: `explorer .`
+  - macOS: `open .`
+  - Ubuntu/Linux 데스크톱: `xdg-open .`
+
 CLI 진입점은 `pyproject.toml`의 `exam-proofreader` 스크립트로 노출되며 다음과 같이 실행할 수 있습니다.
 
 ```bash
@@ -71,40 +91,93 @@ python -m exam_proofreading.cli sample_exam_book.pdf latest_safety_laws.pdf --ou
 
 실행 결과는 `reports/` 디렉터리에 페이지별 JSON 리포트와 요약 파일(`summary.json`)로 저장됩니다.
 
-## 실행 가이드 (차근차근 따라하기)
+## 완전 초보용 실행 가이드 (차근차근 따라하기)
 
-1. **필수 프로그램 설치**
-   - Python 3.10 이상
-   - [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (한국어 학습 데이터 `kor.traineddata` 포함)
-   - `poppler` 또는 `mupdf` 기반 PDF 렌더러 (예: Ubuntu에서는 `sudo apt install poppler-utils`)
-2. **가상환경(선택)**
+### 0. GitHub에서 코드 가져오기
+
+1. GitHub 웹사이트에서 저장소 주소(예: `https://github.com/사용자/exam-proofreading.git`)를 복사합니다.
+2. 터미널(또는 Windows PowerShell)을 열고, 코드를 보관할 위치로 이동합니다.
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # Windows는 .venv\Scripts\activate
+   cd ~/Documents            # Windows PowerShell은 Set-Location ~/Documents
    ```
-3. **의존성 설치**
-   저장소 루트(`/workspace/test`)에서 다음 명령을 실행합니다.
+3. 아래 명령으로 저장소를 내려받습니다.
    ```bash
-   pip install -e .
+   git clone https://github.com/사용자/exam-proofreading.git
    ```
-4. **데이터 준비**
-   - 검수 대상 수험서 PDF (예: `sample_exam_book.pdf`)
-   - 참조할 최신 법령 PDF (예: `latest_safety_laws.pdf`)
-5. **기본 실행**
+4. 복제가 끝나면 `exam-proofreading` 폴더로 이동합니다.
    ```bash
-   exam-proofreader sample_exam_book.pdf latest_safety_laws.pdf --output reports
+   cd exam-proofreading
    ```
-   - 최초 실행 시 `knowledge_base.pkl`이 생성되며 이후 재사용됩니다.
-6. **결과 확인**
-   - `reports/` 폴더에 페이지별 `page_XXX.json` 리포트와 `summary.json`이 생성됩니다.
-   - 로그는 터미널 또는 `--log-level` 옵션을 통해 조정 가능합니다.
-7. **자주 사용하는 옵션**
-   - `--dpi 400` : PDF → 이미지 변환 해상도를 높여 OCR 정확도 향상
-   - `--max-pages 10` : 앞쪽 10페이지만 시험 실행
-   - `--knowledge-base custom_cache.pkl` : 지식 베이스 캐시 파일명 변경
-8. **문제 해결 팁**
-   - OCR 결과가 비어 있으면 Tesseract 경로가 올바른지 확인합니다.
-   - PDF 렌더링 실패 시 `pymupdf`가 설치되어 있는지 또는 `poppler-utils`가 설치되어 있는지 점검합니다.
-   - GPU가 필요하지 않으므로 CPU 환경에서도 실행 가능합니다.
+
+> **TIP**: 현재 위치를 잊어버리면 `pwd`(또는 PowerShell의 `Get-Location`) 명령으로 확인할 수 있습니다.
+
+### 1. 필수 프로그램 설치
+
+- Python 3.10 이상
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (한국어 학습 데이터 `kor.traineddata` 포함)
+- `poppler` 또는 `mupdf` 기반 PDF 렌더러 (예: Ubuntu에서는 `sudo apt install poppler-utils`)
+- Windows: [Chocolatey](https://chocolatey.org/) 사용 시 `choco install python tesseract poppler`
+- macOS: Homebrew 사용 시 `brew install python tesseract poppler`
+- Linux(Ubuntu): `sudo apt install python3 python3-venv tesseract-ocr tesseract-ocr-kor poppler-utils`
+
+### 2. 가상환경 만들기 (선택 권장)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate              # Windows PowerShell은 .venv\Scripts\Activate.ps1
+```
+
+> 가상환경을 종료하고 싶다면 `deactivate` 명령을 입력하세요.
+
+### 3. 의존성 설치
+
+저장소 루트(즉, `pyproject.toml` 파일이 있는 위치)에서 다음 명령을 실행합니다.
+
+```bash
+pip install --upgrade pip
+pip install -e .
+```
+
+설치가 끝나면 CLI가 준비되었는지 아래 명령으로 확인합니다.
+
+```bash
+exam-proofreader --help
+```
+
+### 4. 데이터 준비
+
+- 검수 대상 수험서 PDF (예: `sample_exam_book.pdf`)
+- 참조할 최신 법령 PDF (예: `latest_safety_laws.pdf`)
+- 두 파일을 저장소 폴더 안이나 다른 경로에 넣고, 전체 경로를 메모해 둡니다.
+
+### 5. 기본 실행
+
+```bash
+exam-proofreader sample_exam_book.pdf latest_safety_laws.pdf --output reports
+```
+
+- PDF가 다른 폴더에 있다면 전체 경로를 적어 주세요. 예: `exam-proofreader "C:\\자료\\sample.pdf" "C:\\자료\\laws.pdf" --output "C:\\자료\\reports"`
+- 최초 실행 시 `knowledge_base.pkl`이 생성되며 이후 실행에서는 재사용됩니다.
+
+### 6. 결과 확인
+
+- `reports/` 폴더에 페이지별 `page_XXX.json` 리포트와 `summary.json`이 생성됩니다.
+- Windows에서는 `explorer reports`, macOS에서는 `open reports`, Linux에서는 `xdg-open reports`로 폴더를 바로 열 수 있습니다.
+- 로그 레벨을 조정하고 싶다면 `--log-level INFO`처럼 옵션을 추가하세요.
+
+### 7. 자주 사용하는 옵션
+
+- `--dpi 400` : PDF → 이미지 변환 해상도를 높여 OCR 정확도를 향상합니다.
+- `--max-pages 10` : 앞쪽 10페이지만 시험 삼아 실행합니다.
+- `--knowledge-base custom_cache.pkl` : 지식 베이스 캐시 파일명을 변경합니다.
+- `--language kor+eng` : 한국어와 영어가 섞인 문서를 OCR 처리합니다.
+
+### 8. 문제 해결 팁
+
+- **OCR 결과가 비어 있음**: Tesseract가 설치되어 있는지, `kor.traineddata`가 `tessdata` 폴더에 있는지 확인합니다. Windows에서는 `where tesseract`, macOS/Linux에서는 `which tesseract`로 경로를 확인할 수 있습니다.
+- **PDF 렌더링 실패**: `pip install pymupdf`로 파이썬 PDF 렌더러를 설치하거나, OS 패키지 관리자에서 `poppler` 관련 도구를 설치합니다.
+- **경로 오류**: 경로에 공백이 있다면 따옴표로 감싸 주세요. (예: `"C:\\My Documents\\sample.pdf"`)
+- **실행 중단 후 재시도**: `knowledge_base.pkl` 파일이 이미 있으면 다시 만들지 않고 그대로 사용합니다.
+- GPU는 필요하지 않으며 CPU 환경에서도 실행 가능합니다.
 
 필요 시 `exam-proofreader --help`로 전체 옵션을 확인할 수 있습니다.
