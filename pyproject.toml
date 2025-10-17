@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exam-proofreading"
+version = "0.1.0"
+description = "Automated proofreading workflow for multi-column exam preparation books"
+authors = [{name = "Automation"}]
+readme = "docs/exam_proofreading_workflow.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pillow",
+    "pytesseract",
+    "PyPDF2",
+    "scikit-learn",
+    "opencv-python",
+    "pymupdf",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "ruff",
+]
+
+[project.scripts]
+exam-proofreader = "exam_proofreading.cli:main"
