@@ -29,13 +29,13 @@
 
 ```mermaid
 graph TD
-    subgraph Phase 1: 준비 (최초 1회)
+    subgraph "Phase 1: 준비 (최초 1회)"
         A[법령 PDF 입력] --> B(텍스트 분할)
         B --> C{벡터 임베딩}
         C --> D[벡터 DB 구축]
     end
 
-    subgraph Phase 2: 실행 (페이지별 반복)
+    subgraph "Phase 2: 실행 (페이지별 반복)"
         E[수험서 PDF 입력] --> F(Loop: For Each Page)
         F --> G[1. 페이지 → 이미지 변환]
         G --> H[2. 레이아웃 분석]
