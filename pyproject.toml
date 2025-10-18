@@ -9,20 +9,20 @@ description = "Automated proofreading workflow for multi-column exam preparation
 authors = [{name = "Automation"}]
 readme = "docs/exam_proofreading_workflow.md"
 requires-python = ">=3.10"
-dependencies = [
-    "numpy",
-    "pillow",
-    "pytesseract",
-    "PyPDF2",
-    "scikit-learn",
-    "opencv-python",
-    "pymupdf",
-]
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
     "black",
     "ruff",
+]
+full = [
+    "opencv-python",
+    "pillow",
+    "pymupdf",
+    "PyPDF2",
+    "pytesseract",
+    "scikit-learn",
 ]
 
 [project.scripts]

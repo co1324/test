@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="다단 편집 수험서 자동 검수 프로그램")
-    parser.add_argument("exam_pdf", type=Path, help="검수할 수험서 PDF 경로")
-    parser.add_argument("law_pdf", type=Path, help="참조할 법령 PDF 경로")
+    parser.add_argument("exam_pdf", type=Path, help="검수할 수험서 PDF 또는 텍스트 파일 경로")
+    parser.add_argument("law_pdf", type=Path, help="참조할 법령 PDF 또는 텍스트 파일 경로")
     parser.add_argument("--knowledge-base", type=Path, default=Path("knowledge_base.pkl"), help="지식 베이스 캐시 파일 경로")
     parser.add_argument("--output", type=Path, default=Path("reports"), help="검수 리포트를 저장할 디렉토리")
     parser.add_argument("--dpi", type=int, default=300, help="PDF 페이지 렌더링 DPI")

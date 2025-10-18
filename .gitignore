@@ -6,3 +6,6 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+knowledge_base.pkl
+reports/
+demo_reports/

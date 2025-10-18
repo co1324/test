@@ -11,7 +11,10 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover - optional dependency
     pytesseract = None  # type: ignore
 
-from PIL import Image
+try:  # pragma: no cover - optional dependency
+    from PIL import Image
+except Exception:  # pragma: no cover - optional dependency
+    Image = None  # type: ignore
 
 from .config import OCRConfig
 
@@ -31,7 +34,7 @@ class OCRProcessor:
     """Run OCR over page columns in sequence."""
 
     def __init__(self, config: OCRConfig):
-        if pytesseract is None:
+        if not self.is_available():
             raise RuntimeError("pytesseract is required for OCR operations.")
         self.config = config
         if config.tesseract_cmd:
@@ -47,6 +50,10 @@ class OCRProcessor:
             confidence = sum(confidences) / len(confidences) if confidences else 0.0
             results.append(OCRResult(text=text.strip(), confidence=confidence, column_index=idx))
         return results
+
+    @staticmethod
+    def is_available() -> bool:
+        return pytesseract is not None
 
 
 __all__ = ["OCRProcessor", "OCRResult"]

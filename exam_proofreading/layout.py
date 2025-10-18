@@ -6,14 +6,20 @@ import logging
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
-import numpy as np
+try:  # pragma: no cover - optional dependency
+    import numpy as np
+except Exception:  # pragma: no cover - optional dependency
+    np = None  # type: ignore
 
 try:  # pragma: no cover - optional dependency
     import cv2
 except Exception:  # pragma: no cover - optional dependency
     cv2 = None  # type: ignore
 
-from PIL import Image
+try:  # pragma: no cover - optional dependency
+    from PIL import Image
+except Exception:  # pragma: no cover - optional dependency
+    Image = None  # type: ignore
 
 from .config import LayoutConfig
 
@@ -37,8 +43,8 @@ class ColumnDetector:
     """Detect multi-column layouts on page images."""
 
     def __init__(self, config: LayoutConfig):
-        if cv2 is None:
-            raise RuntimeError("opencv-python is required for column detection.")
+        if not self.is_available():
+            raise RuntimeError("Column detection requires opencv-python, numpy, and Pillow.")
         self.config = config
 
     def detect(self, image: Image.Image) -> List[ColumnBoundingBox]:
@@ -82,6 +88,10 @@ class ColumnDetector:
         if len(boxes) > self.config.maximum_columns:
             boxes = sorted(boxes, key=lambda box: box.x2 - box.x1, reverse=True)[: self.config.maximum_columns]
         return boxes
+
+    @staticmethod
+    def is_available() -> bool:
+        return cv2 is not None and np is not None and Image is not None
 
 
 __all__ = ["ColumnBoundingBox", "ColumnDetector"]
